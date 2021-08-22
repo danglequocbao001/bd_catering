@@ -14,7 +14,7 @@ import { StackParamList } from "../../types";
 import { style } from "../../components";
 import { size } from "../../constants";
 import useConfirmExitApp from "../../hooks/useConfirmExitApp";
-import { authApi, cartItemApi, deliveryAddressApi } from "../../api";
+import { authApi } from "../../api";
 import { ILogin } from "../../api/apiInterfaces";
 import Loader from "../../components/Loader";
 import toast from "../../helpers/toast";
@@ -24,7 +24,6 @@ import { Formik } from "formik";
 import { defaultStyles } from "../../components/Input/default";
 import { useAppDispatch } from "../../hooks/useRedux";
 import { actions } from "../../redux";
-import { storage } from "../../helpers";
 
 export default function LoginScreen({
   navigation,
@@ -33,59 +32,52 @@ export default function LoginScreen({
   const dispatch = useAppDispatch();
   const [nameEye, setNameEye]: any = useState("eye-off-sharp");
   const [securePassword, setsecurePassword] = useState(true);
-  const [request, setRequest] = useState({
-    page: 1,
-    per_page: 1000,
-  });
   useConfirmExitApp();
 
   useEffect(() => {
+    dispatch(actions.auth.logout());
   }, []);
-  async function checkCartAmount() {
-    const cart = await cartItemApi.get();
-    if (cart) {
-      dispatch(actions.cartAmount.update(cart.cart_items.length));
-      goto("Root");
-    }
-  }
 
   async function onLogin(params: ILogin) {
     setLoading(true);
-    let loginParam = {
-      phone_number: "+84" + params.phone_number.substring(1),
-      password: params.password,
-    };
     try {
-      const data = await authApi.login(loginParam);
-      dispatch(actions.auth.login(data.token));
+      const data = await authApi.login({
+        email: params.email,
+        password: params.password,
+      });
+      dispatch(actions.auth.login(data.data.token));
       setLoading(false);
       toast.success("Đăng nhập thành công!");
-      checkCartAmount();
     } catch (error) {
       setLoading(false);
       toast.error(error);
     }
   }
-  function goto(screen: any) {
+
+  function goTo(screen: any) {
     navigation.navigate(screen);
   }
+
   function toggleClickEye() {
     securePassword ? setsecurePassword(false) : setsecurePassword(true);
     nameEye == "eye" ? setNameEye("eye-off-sharp") : setNameEye("eye");
   }
+
   const initialValues = {
-    phone_number: "",
+    email: "",
     password: "",
   };
 
   const title = {
-    phone_number: "Số điện thoại",
+    email: "Email",
     password: "Mật khẩu",
   };
+
   const validationSchema = yup.object().shape({
-    phone_number: validation.string(title.phone_number),
+    email: validation.string(title.email),
     password: validation.string(title.password),
   });
+
   return (
     <View style={style.container}>
       <Loader loading={loading} />
@@ -119,18 +111,18 @@ export default function LoginScreen({
                     <View style={styles.row}>
                       <Feather name="phone" style={styles.icon} />
                       <Input.Text
-                        value={values.phone_number}
-                        onChangeText={handleChange("phone_number")}
+                        value={values.email}
+                        onChangeText={handleChange("email")}
                         style={style.input}
-                        onBlur={handleBlur("phone_number")}
-                        touched={touched.phone_number}
-                        errors={errors.phone_number}
-                        title={title.phone_number}
+                        onBlur={handleBlur("email")}
+                        touched={touched.email}
+                        errors={errors.email}
+                        title={title.email}
                       />
                     </View>
-                    {errors.phone_number && touched.phone_number && (
+                    {errors.email && touched.email && (
                       <Text style={[defaultStyles.error, styles.errors]}>
-                        {errors.phone_number}
+                        {errors.email}
                       </Text>
                     )}
                   </View>
@@ -180,16 +172,9 @@ export default function LoginScreen({
             }}
           </Formik>
           <View style={styles.footer}>
-            <Pressable onPress={() => goto("Email")}>
-              <Text
-                style={[styles.forgot, { fontWeight: "700", marginBottom: 8 }]}
-              >
-                Quên mật khẩu?
-              </Text>
-            </Pressable>
             <View style={styles.dJC}>
               <Text style={{ color: "#979797" }}>Chưa có tài khoản?</Text>
-              <Pressable onPress={() => goto("Signup")}>
+              <Pressable onPress={() => goTo("Signup")}>
                 <Text
                   style={[styles.forgot, { marginLeft: 4, fontWeight: "700" }]}
                 >

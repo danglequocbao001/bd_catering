@@ -3,9 +3,6 @@ import { reducers } from './redux/index'
 
 const rootReducer = {
   auth: reducers.authReducers,
-  address: reducers.addressReducers,
-  search: reducers.searchReducers,
-  cart: reducers.cartAmountReducers
 }
 
 const store = configureStore({

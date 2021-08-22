@@ -32,52 +32,51 @@ export default function SignupScreen({
 }: StackScreenProps<AuthStackParamList, "Signup">) {
   const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
-  const [nameEye, setNameEye]: any =  useState('eye-off-sharp');
-  const [securePassword, setsecurePassword] =  useState(true);
-  useEffect(() => {});
+  const [nameEye, setNameEye]: any = useState("eye-off-sharp");
+  const [securePassword, setsecurePassword] = useState(true);
 
-  function goto(screen: any) {
+  function goTo(screen: any) {
     navigation.navigate(screen);
   }
   function toggleClickEye() {
-    securePassword? setsecurePassword(false): setsecurePassword(true) 
-    nameEye == 'eye'?  setNameEye('eye-off-sharp'): setNameEye('eye')
+    securePassword ? setsecurePassword(false) : setsecurePassword(true);
+    nameEye == "eye" ? setNameEye("eye-off-sharp") : setNameEye("eye");
   }
   const initialValues = {
-    full_name: "",
+    fullName: "",
     email: "",
-    phone_number: "",
+    phone: "",
     password: "",
-    password_confirmation: "",
+    address: "",
   };
 
   const title = {
-    full_name: "Họ và tên",
-    phone_number: "Số điện thoại",
+    fullName: "Họ và tên",
     email: "Email",
+    phone: "Số điện thoại",
     password: "Mật khẩu",
-    password_confirmation: "Nhập lại mật khẩu",
+    address: "Địa chỉ",
   };
 
   const validationSchema = yup.object().shape({
-    full_name: validation.name(title.full_name),
+    fullName: validation.name(title.fullName),
     email: validation.email(title.email),
-    phone_number: validation.phone(title.phone_number),
+    phone: validation.phone(title.phone),
     password: validation.password(title.password),
-    password_confirmation: validation.password(title.password_confirmation),
+    address: validation.string(title.address),
   });
   async function signUp(params: ISignUp) {
-    params.phone_number = "+84" + params.phone_number.substring(1);
     try {
       setLoading(true);
       const data = await authApi.signUp(params);
-      await storage.set("token", data.token);
+      console.log(data);
+      await storage.set("token", data.data.token);
       dispatch(actions.auth.login);
-      goto("Root");
-      setLoading(false);
       toast.success("Đăng ký thành công!");
-      goto("Root");
+      goTo("Root");
+      setLoading(false);
     } catch (error) {
+      console.log(error);
       toast.error(error);
       setLoading(false);
     }
@@ -114,19 +113,19 @@ export default function SignupScreen({
                     <View style={styles.row}>
                       <AntDesign name="user" style={styles.icon} />
                       <Input.Text
-                        value={values.full_name}
-                        onChangeText={handleChange("full_name")}
+                        value={values.fullName}
+                        onChangeText={handleChange("fullName")}
                         style={style.input}
-                        onBlur={handleBlur("full_name")}
-                        touched={touched.full_name}
-                        errors={errors.full_name}
-                        title={title.full_name}
+                        onBlur={handleBlur("fullName")}
+                        touched={touched.fullName}
+                        errors={errors.fullName}
+                        title={title.fullName}
                       />
                     </View>
 
-                    {errors.full_name && touched.full_name && (
+                    {errors.fullName && touched.fullName && (
                       <Text style={[defaultStyles.error, styles.errors]}>
-                        {errors.full_name}
+                        {errors.fullName}
                       </Text>
                     )}
                   </View>
@@ -134,18 +133,18 @@ export default function SignupScreen({
                     <View style={styles.row}>
                       <Feather name="phone" style={styles.icon} />
                       <Input.Text
-                        value={values.phone_number}
-                        onChangeText={handleChange("phone_number")}
+                        value={values.phone}
+                        onChangeText={handleChange("phone")}
                         style={style.input}
-                        onBlur={handleBlur("phone_number")}
-                        touched={touched.phone_number}
-                        errors={errors.phone_number}
-                        title={title.phone_number}
+                        onBlur={handleBlur("phone")}
+                        touched={touched.phone}
+                        errors={errors.phone}
+                        title={title.phone}
                       />
                     </View>
-                    {errors.phone_number && touched.phone_number && (
+                    {errors.phone && touched.phone && (
                       <Text style={[defaultStyles.error, styles.errors]}>
-                        {errors.phone_number}
+                        {errors.phone}
                       </Text>
                     )}
                   </View>
@@ -173,7 +172,10 @@ export default function SignupScreen({
                   </View>
                   <View style={{ marginBottom: 16 }}>
                     <View style={styles.row}>
-                    <Ionicons name="md-lock-closed-outline" style= {styles.icon} />
+                      <Ionicons
+                        name="md-lock-closed-outline"
+                        style={styles.icon}
+                      />
                       <Input.Text
                         value={values.password}
                         onChangeText={handleChange("password")}
@@ -182,10 +184,13 @@ export default function SignupScreen({
                         touched={touched.password}
                         errors={errors.password}
                         title={title.password}
-                        secureTextEntry = {securePassword}
-
+                        secureTextEntry={securePassword}
                       />
-                        <Ionicons name = {nameEye} style ={[styles.icon, styles.iconEye]} onPress = {toggleClickEye} />
+                      <Ionicons
+                        name={nameEye}
+                        style={[styles.icon, styles.iconEye]}
+                        onPress={toggleClickEye}
+                      />
                     </View>
                     {errors.password && touched.password && (
                       <Text style={[defaultStyles.error, styles.errors]}>
@@ -195,23 +200,25 @@ export default function SignupScreen({
                   </View>
                   <View style={{ marginBottom: 16 }}>
                     <View style={styles.row}>
-                    <Ionicons name="md-lock-closed-outline" style= {styles.icon} />
+                      <MaterialCommunityIcons
+                        name="tag-outline"
+                        style={styles.icon}
+                      />
                       <Input.Text
-                        value={values.password_confirmation}
-                        onChangeText={handleChange("password_confirmation")}
+                        value={values.address}
+                        onChangeText={handleChange("address")}
                         style={style.input}
-                        onBlur={handleBlur("password_confirmation")}
-                        touched={touched.password_confirmation}
-                        errors={errors.password_confirmation}
-                        title={title.password_confirmation}
+                        onBlur={handleBlur("address")}
+                        touched={touched.address}
+                        errors={errors.name}
+                        title={title.address}
                       />
                     </View>
-                    {errors.password_confirmation &&
-                      touched.password_confirmation && (
-                        <Text style={[defaultStyles.error, styles.errors]}>
-                          {errors.password_confirmation}
-                        </Text>
-                      )}
+                    {errors.name && touched.name && (
+                      <Text style={[defaultStyles.error, styles.errors]}>
+                        {errors.name}
+                      </Text>
+                    )}
                   </View>
                   <TouchableOpacity
                     style={styles.button}
@@ -232,7 +239,7 @@ export default function SignupScreen({
           <View style={styles.footer}>
             <View style={styles.dJC}>
               <Text style={{ color: "#979797" }}>Đã có tài khoản?</Text>
-              <Pressable onPress={() => goto("Login")}>
+              <Pressable onPress={() => goTo("Login")}>
                 <Text style={[styles.forgot, { marginLeft: 4 }]}>
                   Đăng nhập ngay
                 </Text>
@@ -279,9 +286,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
   },
   iconEye: {
-    position: 'absolute',
+    position: "absolute",
     right: 10,
-    color: '#cecece'
+    color: "#cecece",
   },
   title: {
     fontSize: 16,

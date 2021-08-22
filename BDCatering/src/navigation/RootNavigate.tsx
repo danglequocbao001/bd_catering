@@ -13,7 +13,7 @@ import {
   SearchResult,
 } from "../screens";
 import BottomTabNavigator from "../screens/Contains/Tabs";
-import { IScreen, RootStackParamList, StackParamList } from "../types";
+import { IScreen, RootStackParamList } from "../types";
 
 interface IRootScreen extends IScreen {
   name: keyof RootStackParamList;
@@ -63,27 +63,12 @@ const screens: IRootScreen[] = [
     },
   },
   {
-    name: "DeliveryInformation",
-    component: DeliveryInformation,
-    options: {
-      headerShown: false,
-    },
-  },
-  {
-    name: "ChangePassword",
-    component: ChangePassword,
-    options: {
-      headerShown: false,
-    },
-  },
-  {
     name: "SearchResult",
     component: SearchResult,
     options: {
       headerShown: false,
     },
   },
-  
 ];
 
 const Stack = createStackNavigator<RootStackParamList>();

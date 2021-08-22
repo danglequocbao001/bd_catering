@@ -6,11 +6,12 @@ export const defaultInput = {
     min: 2,
     max: 30,
   },
+
   password: {
     min: 6,
     max: 30,
   },
- 
+
   text: {
     invalid: (title: string) => `${title} không hợp lệ`,
     empty: (title: string) => `${title} không được để trống`,
@@ -42,15 +43,12 @@ export const validation = {
       .max(password.max, text.max(title))
       .required(text.empty(title)),
 
-  password_confirmation: (title: string) =>
-    Yup.string()
-      .required(text.empty(title))
-      .oneOf([Yup.ref('password')], text.notMatch(title)),
   string: (title: string) => Yup.string().required(text.empty(title)),
+
   inputCode: () =>
-        Yup.string()
-        .required()
-        .max(1)
+    Yup.string()
+      .required()
+      .max(1)
 
 
 }
