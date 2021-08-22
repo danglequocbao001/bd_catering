@@ -58,7 +58,7 @@ export default {
     Toast.show({
       type: "success",
       position: "top",
-      visibilityTime: time|| 1200,
+      visibilityTime: time || 1200,
       text2: typeof text === "string" ? text : "",
     });
   },
@@ -67,7 +67,7 @@ export default {
     Toast.show({
       type: "error",
       position: "top",
-      visibilityTime:  time || 1200,
+      visibilityTime: time || 1200,
       text2: typeof text === "string" && text ? text : defaultError,
     });
   },
@@ -76,7 +76,7 @@ export default {
     Toast.show({
       type: "info",
       position: "top",
-      visibilityTime:  time || 1200,
+      visibilityTime: time || 1200,
       text2: typeof text === "string" ? text : "",
     });
   },

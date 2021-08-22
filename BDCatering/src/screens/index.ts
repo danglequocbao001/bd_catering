@@ -10,10 +10,7 @@ import OrderDetail from './Contains/OrderDetail'
 import Payment from './Contains/Payment'
 import Order from './Contains/Tabs/Order'
 import Signup from './Auth/Signup'
-import Email from './Auth/resetPassword/Email'
-import NewPassword from './Auth/resetPassword/NewPassword'
 import DeliveryInformation from './Contains/DeliveryInformation'
-import VerificationCode from './Auth/resetPassword/VerificationCode'
 import CheckCart from './Contains/CheckCart'
 import ChangePassword from './Contains/ChangePassword'
 import SearchResult from './Contains/SearchResult'
@@ -31,9 +28,6 @@ export {
   CheckCart,
   Login,
   Signup,
-  Email,
-  NewPassword,
-  VerificationCode,
   DeliveryInformation,
   ChangePassword,
   SearchResult

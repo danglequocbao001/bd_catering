@@ -1,11 +1,5 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-// import cartItemApi from '../api/user'
+import { createSlice } from '@reduxjs/toolkit'
 import { storage } from '../helpers'
-
-// const cart = createAsyncThunk('auth/user', async () => {
-//   const cart = await cartItemApi.get()
-//   return cart.data
-// })
 
 const slice = createSlice({
   name: 'auth',
@@ -23,15 +17,9 @@ const slice = createSlice({
     logout: state => {
       state.isLogin = false;
       state.token = null
-      storage.clearWithout(['idAddressActive', 'address','phone', 'cartAmount'])
+      storage.clear()
     },
   },
-  // extraReducers: builder =>{
-  //   builder.addCase(cart.fulfilled, (state, actions) =>{
-  //     console.log('set', actions.payload)
-  //     state.cartAmount = actions.payload
-  //   })
-  // }
 })
 
 export const authActions = slice.actions

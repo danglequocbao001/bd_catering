@@ -6,7 +6,6 @@ import {
 import * as React from "react";
 import { useState } from "react";
 import { ColorSchemeName } from "react-native";
-import { cartItemApi } from "../api";
 import { storage } from "../helpers";
 import toast from "../helpers/toast";
 import { useAppDispatch, useAppSelector } from "../hooks/useRedux";
@@ -26,8 +25,6 @@ export default function Navigation({
 
   React.useEffect(() => {
     getToken();
-    getAddress();
-    getCartAmount();
   }, []);
   async function getToken() {
     setLoading(true);
@@ -40,34 +37,6 @@ export default function Navigation({
       toast.error(error);
     }
     setLoading(false);
-  }
-  async function getAddress() {
-    setLoading(true);
-    try {
-      const idAddressActive = await storage.get("idAddressActive");
-      const address = await storage.get("address");
-      const phone = await storage.get("phone");
-      const payload = {
-        idAddressActive: idAddressActive,
-        address: address,
-        phone: phone,
-      };
-      if (idAddressActive) {
-        dispatch(actions.address.update(payload));
-      }
-    } catch (error) {
-      toast.error(error);
-    }
-    setLoading(false);
-  }
-
-  async function getCartAmount() {
-    try {
-      const cartAmount = await storage.get("cartAmount");
-      dispatch(actions.cartAmount.update(cartAmount));
-    } catch (error) {
-      toast.error(error);
-    }
   }
   return (
     <>

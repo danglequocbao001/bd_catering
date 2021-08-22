@@ -10,18 +10,12 @@ export type RootStackParamList = {
   CheckCart: { cart: any; total: any };
   OrderDetail: { item: any };
   Payment: { id: any };
-  DeliveryInformation: undefined;
-  ChangePassword: undefined;
   SearchResult: undefined;
 };
 
 export type AuthStackParamList = {
   Login: undefined;
   Signup: undefined;
-  Email: undefined;
-  VerificationCode: undefined;
-  NewPassword: { token: any };
-  LayoutSuccess: { title: string };
 };
 export type StackParamList = RootStackParamList &
   AuthStackParamList &
@@ -45,8 +39,4 @@ export interface IHeader {
 
 export type StorageParamList = {
   token: undefined;
-  address: undefined;
-  phone: undefined;
-  idAddressActive: string;
-  cartAmount: number;
 };
