@@ -5,7 +5,7 @@ import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { defaultColor } from "../../../constants";
 import { StackParamList } from "../../../types";
-import { homePageApi } from "../../../api";
+import { cartApi, homePageApi } from "../../../api";
 import {
   StyleSheet,
   Image,
@@ -21,6 +21,7 @@ import Loader from "../../../components/Loader";
 import { toast } from "../../../helpers";
 import { actions } from "../../../redux";
 import { useDispatch } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
 const { StatusBarManager } = NativeModules;
 const statusBar = Platform.OS === "ios" ? 30 : StatusBarManager.HEIGHT;
 
@@ -29,6 +30,7 @@ export default function HomeScreen({
 }: StackScreenProps<StackParamList, "Root">) {
   const [loading, setLoading] = useState(false);
   var [products, setProducts]: any = useState([]);
+  const [cartAmount, setCartAmount] = useState(0);
   const dispatch = useDispatch();
 
   useConfirmExitApp();
@@ -36,6 +38,12 @@ export default function HomeScreen({
   useEffect(() => {
     onProducts();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      onCartAmount();
+    }, [])
+  );
 
   async function onProducts() {
     handleSetRequest().then(async (request) => {
@@ -63,6 +71,15 @@ export default function HomeScreen({
   function handleLoadMore() {
     onProducts();
   }
+
+  const onCartAmount = async () => {
+    try {
+      const data = await cartApi.getCount();
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   function onExpired(error: any) {
     if (error == undefined) {
@@ -124,7 +141,7 @@ export default function HomeScreen({
             size={24}
             color={defaultColor.color.main}
           />
-          {/* {cartAmount > 0 ? (
+          {cartAmount > 0 ? (
             <View
               style={{
                 position: "absolute",
@@ -147,7 +164,7 @@ export default function HomeScreen({
                 {cartAmount}
               </Text>
             </View>
-          ) : null} */}
+          ) : null}
         </TouchableOpacity>
       </View>
       <SafeAreaView>
