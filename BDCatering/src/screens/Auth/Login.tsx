@@ -32,11 +32,8 @@ export default function LoginScreen({
   const dispatch = useAppDispatch();
   const [nameEye, setNameEye]: any = useState("eye-off-sharp");
   const [securePassword, setsecurePassword] = useState(true);
-  useConfirmExitApp();
 
-  useEffect(() => {
-    dispatch(actions.auth.logout());
-  }, []);
+  useConfirmExitApp();
 
   async function onLogin(params: ILogin) {
     setLoading(true);
@@ -74,8 +71,8 @@ export default function LoginScreen({
   };
 
   const validationSchema = yup.object().shape({
-    email: validation.string(title.email),
-    password: validation.string(title.password),
+    email: validation.email(title.email),
+    password: validation.password(title.password),
   });
 
   return (
