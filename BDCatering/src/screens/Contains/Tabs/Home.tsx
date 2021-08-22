@@ -5,7 +5,7 @@ import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { defaultColor } from "../../../constants";
 import { StackParamList } from "../../../types";
-import { productApi } from "../../../api";
+import { homePageApi } from "../../../api";
 import {
   StyleSheet,
   Image,
@@ -19,7 +19,6 @@ import useConfirmExitApp from "../../../hooks/useConfirmExitApp";
 import { Platform, NativeModules } from "react-native";
 import Loader from "../../../components/Loader";
 import { toast } from "../../../helpers";
-import { useAppSelector } from "../../../hooks/useRedux";
 import { actions } from "../../../redux";
 import { useDispatch } from "react-redux";
 const { StatusBarManager } = NativeModules;
@@ -29,33 +28,40 @@ export default function HomeScreen({
   navigation,
 }: StackScreenProps<StackParamList, "Root">) {
   const [loading, setLoading] = useState(false);
-  var [products, setProducts] = useState([]);
-  // const param = route.params?.q
-  const [lengthData, setLengthData] = useState(0);
-  const cartAmount: any = useAppSelector((state) => state.cart.cartAmount);
-  const [request, setRequest] = useState({
-    page: 1,
-    per_page: 6,
-    q: "",
-  });
+  var [products, setProducts]: any = useState([]);
   const dispatch = useDispatch();
+
+  useConfirmExitApp();
 
   useEffect(() => {
     onProducts();
   }, []);
 
   async function onProducts() {
-    setLoading(true);
-    try {
-      const data = await productApi.get(request);
-      setLengthData(data.meta.pagination.total_objects);
-      setProducts(products.concat(data.products));
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      toast.error(error);
-      onExpired(error);
-    }
+    handleSetRequest().then(async (request) => {
+      setLoading(true);
+      try {
+        const data = await homePageApi.getAll(request.date, request.limit);
+        setProducts(products.concat(data.data));
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        toast.error(error);
+        onExpired(error);
+      }
+    });
+  }
+
+  async function handleSetRequest() {
+    const request = {
+      date: products.length == 0 ? 0 : products[products.length - 1].createdAt,
+      limit: 10,
+    };
+    return request;
+  }
+
+  function handleLoadMore() {
+    onProducts();
   }
 
   function onExpired(error: any) {
@@ -72,34 +78,20 @@ export default function HomeScreen({
     }
   }
 
-  function handleLoadMore() {
-    setRequest({
-      page: request.page++,
-      per_page: 2,
-      q: "",
-    });
-    if (lengthData > products.length) {
-      onProducts();
-    } else {
-      return;
-    }
-  }
-  useConfirmExitApp();
-
   function renderItem({ item }: { item: any }) {
     return (
       <TouchableOpacity
         style={styles.box}
-        key={item.id}
+        key={item.foodId}
         onPress={() => navigation.navigate("Product", { item: item })}
       >
         <View style={styles.boxWrapp}>
           <Image
-            source={{ uri: item.thumb_image.url }}
+            source={{ uri: item.images[0].imageUrl }}
             style={styles.imageSlide}
           />
-          <Text style={styles.title} numberOfLines={2}>
-            {item.name}
+          <Text style={styles.title} numberOfLines={1}>
+            {item.foodName}
           </Text>
           <Text style={styles.type} numberOfLines={2}>
             {item.description == "" ? "Chưa có mô tả" : item.description}
@@ -108,7 +100,7 @@ export default function HomeScreen({
             <View style={styles.cricle}>
               <Entypo name="credit" size={13} color="#209539" />
             </View>
-            <Text style={styles.price}>{item.price_range}</Text>
+            <Text style={styles.price}>{item.price}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -132,7 +124,7 @@ export default function HomeScreen({
             size={24}
             color={defaultColor.color.main}
           />
-          {cartAmount > 0 ? (
+          {/* {cartAmount > 0 ? (
             <View
               style={{
                 position: "absolute",
@@ -155,7 +147,7 @@ export default function HomeScreen({
                 {cartAmount}
               </Text>
             </View>
-          ) : null}
+          ) : null} */}
         </TouchableOpacity>
       </View>
       <SafeAreaView>
@@ -168,7 +160,6 @@ export default function HomeScreen({
             numColumns={2}
             renderItem={renderItem}
             keyExtractor={(item, index) => String(index)}
-            // KHÔNG XÓA DÒNG NÀY, K xóa 'item' nha chị, xóa nó warning
             onEndReached={handleLoadMore}
             onEndReachedThreshold={0.5}
           />
@@ -246,7 +237,7 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 4,
-    height: 40,
+    marginBottom: 4,
     color: "rgba(0, 0, 0, 0.87)",
     fontSize: 15,
   },
@@ -266,8 +257,8 @@ const styles = StyleSheet.create({
   },
 
   type: {
-    height: 40,
     color: "rgba(128, 128, 128, 0.87)",
+    marginBottom: 5,
   },
   price: {
     color: "#209539",
