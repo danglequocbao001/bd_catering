@@ -5,7 +5,7 @@ export type RootStackParamList = {
   Login: undefined;
   NotFound: undefined;
   Search: undefined;
-  Product: { item: any };
+  Product: { food: any };
   Cart: undefined;
   CheckCart: { cart: any; total: any };
   OrderDetail: { item: any };
