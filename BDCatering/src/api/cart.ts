@@ -2,7 +2,7 @@ import api from "./api";
 import API_CONSTANTS from "./constants";
 
 export default {
-  getCount: () => {
+  getCount: (): any => {
     return api.get(API_CONSTANTS.CART.GET_COUNT);
   },
   getAll: (): any => {

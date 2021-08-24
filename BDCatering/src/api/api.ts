@@ -18,7 +18,7 @@ const api = axios.create({
 api.interceptors.request.use(async (config: AxiosRequestConfig) => {
   try {
     const token = await storage.get('token')
-    token && (config.headers['Authorization'] = `${token}`)
+    token && (config.headers['Authorization'] = `Bearer ${token}`)
   } catch (error) { }
   return config
 })
