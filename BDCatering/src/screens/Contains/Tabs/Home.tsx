@@ -18,10 +18,9 @@ import { StackScreenProps } from "@react-navigation/stack";
 import useConfirmExitApp from "../../../hooks/useConfirmExitApp";
 import { Platform, NativeModules } from "react-native";
 import Loader from "../../../components/Loader";
-import { toast } from "../../../helpers";
+import { format, toast } from "../../../helpers";
 import { actions } from "../../../redux";
 import { useDispatch } from "react-redux";
-import { useFocusEffect } from "@react-navigation/native";
 const { StatusBarManager } = NativeModules;
 const statusBar = Platform.OS === "ios" ? 30 : StatusBarManager.HEIGHT;
 
@@ -30,7 +29,6 @@ export default function HomeScreen({
 }: StackScreenProps<StackParamList, "Root">) {
   const [loading, setLoading] = useState(false);
   var [products, setProducts]: any = useState([]);
-  const [cartAmount, setCartAmount] = useState(0);
   const dispatch = useDispatch();
 
   useConfirmExitApp();
@@ -38,12 +36,6 @@ export default function HomeScreen({
   useEffect(() => {
     onProducts();
   }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      onCartAmount();
-    }, [])
-  );
 
   async function onProducts() {
     handleSetRequest().then(async (request) => {
@@ -54,7 +46,6 @@ export default function HomeScreen({
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        toast.error(error);
         onExpired(error);
       }
     });
@@ -63,23 +54,10 @@ export default function HomeScreen({
   async function handleSetRequest() {
     const request = {
       date: products.length == 0 ? 0 : products[products.length - 1].createdAt,
-      limit: 10,
+      limit: 50,
     };
     return request;
   }
-
-  function handleLoadMore() {
-    onProducts();
-  }
-
-  const onCartAmount = async () => {
-    try {
-      const data = await cartApi.getCount();
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   function onExpired(error: any) {
     if (error == undefined) {
@@ -92,7 +70,7 @@ export default function HomeScreen({
           },
         },
       ]);
-    }
+    } else toast.error(error);
   }
 
   function renderItem({ item }: { item: any }) {
@@ -100,7 +78,7 @@ export default function HomeScreen({
       <TouchableOpacity
         style={styles.box}
         key={item.foodId}
-        onPress={() => navigation.navigate("Product", { item: item })}
+        onPress={() => navigation.navigate("Product", { food: item })}
       >
         <View style={styles.boxWrapp}>
           <Image
@@ -117,7 +95,9 @@ export default function HomeScreen({
             <View style={styles.cricle}>
               <Entypo name="credit" size={13} color="#209539" />
             </View>
-            <Text style={styles.price}>{item.price}</Text>
+            <Text style={styles.price}>
+              {format.currencyFormat(item.price)}đ
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -141,7 +121,7 @@ export default function HomeScreen({
             size={24}
             color={defaultColor.color.main}
           />
-          {cartAmount > 0 ? (
+          {0 > 0 ? (
             <View
               style={{
                 position: "absolute",
@@ -161,12 +141,37 @@ export default function HomeScreen({
                   fontSize: 13,
                 }}
               >
-                {cartAmount}
+                {0}
               </Text>
             </View>
           ) : null}
         </TouchableOpacity>
       </View>
+      {products.length == 0 && (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <MaterialCommunityIcons
+            style={{ marginTop: 100 }}
+            name="database-remove"
+            size={150}
+            color={"#e6e6e6"}
+          />
+          <Text
+            style={{
+              fontWeight: "bold",
+              fontSize: 16,
+              color: "#6D6D6D",
+              marginTop: 20,
+            }}
+          >
+            Không có dữ liệu
+          </Text>
+        </View>
+      )}
       <SafeAreaView>
         {products && (
           <FlatList
@@ -177,23 +182,11 @@ export default function HomeScreen({
             numColumns={2}
             renderItem={renderItem}
             keyExtractor={(item, index) => String(index)}
-            onEndReached={handleLoadMore}
+            onEndReached={onProducts}
             onEndReachedThreshold={0.5}
           />
         )}
       </SafeAreaView>
-      {products.length == 0 && (
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Text style={{ fontSize: 16 }}>Sản phẩm không tồn tại</Text>
-        </View>
-      )}
     </View>
   );
 }
