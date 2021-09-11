@@ -30,9 +30,8 @@ export default function HomeScreen({
   const [loading, setLoading] = useState(false);
   var [products, setProducts]: any = useState([]);
   const dispatch = useDispatch();
-
   useConfirmExitApp();
-
+  
   useEffect(() => {
     onProducts();
   }, []);
