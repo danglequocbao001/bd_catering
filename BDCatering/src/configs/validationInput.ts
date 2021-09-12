@@ -49,6 +49,4 @@ export const validation = {
     Yup.string()
       .required()
       .max(1)
-
-
 }
